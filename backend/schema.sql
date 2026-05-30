@@ -1,5 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+CREATE OR REPLACE FUNCTION immutable_text_array_to_string(items text[], delimiter text)
+RETURNS text
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT array_to_string(items, delimiter) $$;
+
 CREATE TABLE IF NOT EXISTS profiles (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL,
@@ -15,7 +21,7 @@ CREATE TABLE IF NOT EXISTS profiles (
             coalesce(name, '') || ' ' ||
             coalesce(summary, '') || ' ' ||
             coalesce(raw_text, '') || ' ' ||
-            coalesce(array_to_string(tech_stack, ' '), '')
+            coalesce(immutable_text_array_to_string(tech_stack, ' '), '')
         )
     ) STORED
 );
