@@ -5,3 +5,12 @@
 {"id":"int-30e8087b","kind":"field_change","created_at":"2026-05-30T07:08:43.976199Z","actor":"ilsun yun","issue_id":"ralphthon-bje.4","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
 {"id":"int-f3187513","kind":"field_change","created_at":"2026-05-30T07:08:44.308062Z","actor":"ilsun yun","issue_id":"ralphthon-bje.5","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
 {"id":"int-94b4791c","kind":"field_change","created_at":"2026-05-30T07:08:44.640885Z","actor":"ilsun yun","issue_id":"ralphthon-bje.6","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-ec8b2dd4","kind":"field_change","created_at":"2026-05-30T07:09:15.924827Z","actor":"ilsun yun","issue_id":"ralphthon-bje.3","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-577a6566","kind":"field_change","created_at":"2026-05-30T07:09:16.258054Z","actor":"ilsun yun","issue_id":"ralphthon-bje.4","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-e73e3c6d","kind":"field_change","created_at":"2026-05-30T07:09:16.593479Z","actor":"ilsun yun","issue_id":"ralphthon-bje.5","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-54f8a95f","kind":"field_change","created_at":"2026-05-30T07:09:16.922095Z","actor":"ilsun yun","issue_id":"ralphthon-bje.6","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-f1ca4152","kind":"field_change","created_at":"2026-05-30T07:09:45.703045Z","actor":"ilsun yun","issue_id":"ralphthon-bje.3","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-b97b85b8","kind":"field_change","created_at":"2026-05-30T07:09:46.39618Z","actor":"ilsun yun","issue_id":"ralphthon-bje.4","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-27370d4e","kind":"field_change","created_at":"2026-05-30T07:09:47.034784Z","actor":"ilsun yun","issue_id":"ralphthon-bje.5","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-580707ec","kind":"field_change","created_at":"2026-05-30T07:09:47.674064Z","actor":"ilsun yun","issue_id":"ralphthon-bje.6","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-fc9069a9","kind":"field_change","created_at":"2026-05-30T07:10:39.710097Z","actor":"ilsun yun","issue_id":"ralphthon-bje.4","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
