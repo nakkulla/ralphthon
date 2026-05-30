@@ -135,6 +135,24 @@ MoodBoard  음악 감정 분석 기반 플레이리스트 큐레이션  music,ai
 
 이미지는 브라우저/뷰어에서 `http://localhost:8000/images/a14d...`로 바로 열린다.
 
+### Scene 5b — 기술스택으로 조회 (스킬 → CLI)
+
+팀원이 특정 스택을 쓰는 프로파일을 찾는다(스킬을 통해):
+
+> "`profile-gallery`로 FastAPI랑 pgvector 쓰는 프로젝트 찾아줘"
+
+스킬이 이를 `--tech` 필터로 매핑해 CLI를 호출한다:
+
+```
+$ pgal search --tech FastAPI,pgvector --tech-match all
+NAME       SUMMARY                                  TECH_STACK                       IMAGE
+MoodBoard  음악 감정 분석 기반 플레이리스트 큐레이션  Next.js,FastAPI,pgvector,Spotify  /images/a14d...
+```
+
+백엔드는 `tech_stack` 배열에 `@>{FastAPI,pgvector}`(all) 또는 `&&`(any) 연산으로
+정확히 필터한다. FTS 부분일치가 아니라 배열 매칭이라 표기 흔들림 없이 동작한다.
+`--tags`/`--q`와 결합하면 "ai 태그 + FastAPI 스택" 같은 교집합 조회도 된다.
+
 ---
 
 ## Scene 6 — 수정 (수정 플로우 B, 스킬 → CLI)

@@ -121,6 +121,7 @@ CRUD API를 제공하며, 등록·수정·검색·삭제 전 과정을 단일 Co
 ### 4.2 인덱스
 
 - `profiles.search_vector` → GIN
+- `profiles.tech_stack` → GIN (배열 포함/겹침 검색용)
 - `tags(name, kind)` → UNIQUE
 - `profile_tags(tag_id)` → 보조 인덱스 (태그 역검색)
 
@@ -137,14 +138,22 @@ MVP 최단경로로 단일 `backend/schema.sql`을 백엔드 기동 시 **idempo
 - `q`: 전문검색어 (FTS). `websearch_to_tsquery('simple', q)`로 변환, `ts_rank`로 정렬.
 - `tags`: 콤마구분 태그 필터 (AND/OR는 `match=all|any`, 기본 any).
 - `kind`: `tag|keyword|all` (기본 all) — 태그 필터 대상 종류.
+- `tech`: 콤마구분 기술스택 필터. `profiles.tech_stack` 배열에 대해 매칭.
+- `tech_match`: `any|all` (기본 any). `any`는 배열 겹침(`&&`), `all`은 배열 포함(`@>`).
 - `limit`, `offset`: 페이지네이션.
+
+`tech` 필터는 **1급 기능**이다. "어떤 기술스택을 가진 프로파일을 찾아줘"라는 조회가
+FTS 부분일치에 의존하지 않고 `tech_stack` 배열 매칭으로 정확히 동작하도록 한다.
+대소문자/표기 흔들림을 줄이기 위해 비교 시 양쪽을 정규화(소문자 트림)한다.
 
 동작:
 
 1. `q`가 있으면 FTS 조건 + `ts_rank` 정렬, 없으면 `updated_at desc`.
 2. `tags`가 있으면 `profile_tags` 조인으로 필터.
-3. 결과는 프로파일 + 첨부 이미지(url) + 태그/키워드를 포함해 반환.
-4. 결과를 Valkey `search:{정규화질의해시}`에 짧은 TTL로 캐싱.
+3. `tech`가 있으면 `tech_stack` 배열 연산(`&&`/`@>`)으로 필터.
+4. 위 조건들은 AND로 결합된다(예: `tech=FastAPI` + `tags=ai`).
+5. 결과는 프로파일 + 첨부 이미지(url) + 태그/키워드 + tech_stack을 포함해 반환.
+6. 결과를 Valkey `search:{정규화질의해시}`에 짧은 TTL로 캐싱.
 
 ## 6. Valkey 캐싱 전략
 
@@ -214,7 +223,7 @@ MVP 최단경로로 단일 `backend/schema.sql`을 백엔드 기동 시 **idempo
 | `pgal image delete <image_id>` | `DELETE /images/{id}` |
 | `pgal tag add <profile_id> --tags a,b --keywords c,d` | `POST /profiles/{id}/tags` |
 | `pgal tag remove <profile_id> --tags a` | `DELETE /profiles/{id}/tags` |
-| `pgal search --q "..." --tags ... --kind tag` | `GET /search` |
+| `pgal search --q "..." --tags ... --kind tag --tech FastAPI,pgvector --tech-match any` | `GET /search` (q·태그·기술스택 필터) |
 
 오류 시 비정상 종료코드 + 명확한 메시지. `--json` 모드에서는 오류도 JSON으로 출력.
 
@@ -254,7 +263,10 @@ SKILL.md 워크플로 분기:
   4. `pgal profile create` → `pgal image add` → `pgal search`로 검증.
 - **(B) 수정**: `pgal profile get`으로 현재 상태 조회 → 필드 재분석/편집(필요 시 이미지
   재생성) → `pgal profile update` / `pgal image add`.
-- **(C) 검색/브라우즈**: `pgal search`, `pgal tag`(브라우즈).
+- **(C) 검색/브라우즈**: 자연어 조회를 `pgal search` 호출로 매핑. 특히 "어떤 기술스택을
+  가진 프로파일 찾아줘" 같은 요청은 `pgal search --tech <스택>`(필요 시 `--tags`/`--q`와
+  결합)으로 변환해 실행하고, 결과를 사람이 읽기 좋게 정리해 보여준다. `pgal tag`로 태그
+  브라우즈.
 - **(D) 삭제**: `pgal profile delete`.
 
 스킬 description은 "프로젝트 프로파일을 등록/수정/검색/삭제하고 대표 이미지를 생성한다"
@@ -313,7 +325,8 @@ ralphthon/
 1. `docker compose up`으로 postgres·valkey·backend가 기동되고 `/healthz`가 200.
 2. `pgal profile create`로 프로파일이 저장되고 `pgal profile get`으로 조회된다.
 3. `pgal image add`로 업로드한 이미지가 `/images/{id}`로 서빙된다.
-4. `pgal search --q ... --tags ...`가 태그 + FTS 결합 결과를 반환한다.
+4. `pgal search`가 FTS(`--q`) + 태그(`--tags`) + **기술스택(`--tech`)** 필터를 결합해
+   반환하고, 스킬을 통한 "특정 기술스택 보유 프로파일 조회"가 CLI 경유로 동작한다.
 5. `pgal profile update`/`delete`가 동작하고 캐시가 무효화된다.
 6. `profile-gallery` 단일 스킬의 등록 플로우가 레포 + Codex 메모리에서 정보를 **자동
    수집해 등록 초안을 만들고, 사용자 컨펌 후** `pgal` CLI 호출로 저장까지 end-to-end
