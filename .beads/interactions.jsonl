@@ -1,2 +1,7 @@
 {"id":"int-34c41331","kind":"field_change","created_at":"2026-05-30T06:51:03.623566Z","actor":"ilsun yun","issue_id":"ralphthon-bje","extra":{"field":"status","new_value":"in_progress","old_value":"open"}}
 {"id":"int-1646d183","kind":"field_change","created_at":"2026-05-30T06:54:03.93915Z","actor":"ilsun yun","issue_id":"ralphthon-bje.1","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-74ae935d","kind":"field_change","created_at":"2026-05-30T07:08:43.203683Z","actor":"ilsun yun","issue_id":"ralphthon-bje.2","extra":{"field":"status","new_value":"resolved","old_value":"in_progress"}}
+{"id":"int-98cac5e1","kind":"field_change","created_at":"2026-05-30T07:08:43.641884Z","actor":"ilsun yun","issue_id":"ralphthon-bje.3","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-30e8087b","kind":"field_change","created_at":"2026-05-30T07:08:43.976199Z","actor":"ilsun yun","issue_id":"ralphthon-bje.4","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-f3187513","kind":"field_change","created_at":"2026-05-30T07:08:44.308062Z","actor":"ilsun yun","issue_id":"ralphthon-bje.5","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
+{"id":"int-94b4791c","kind":"field_change","created_at":"2026-05-30T07:08:44.640885Z","actor":"ilsun yun","issue_id":"ralphthon-bje.6","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
