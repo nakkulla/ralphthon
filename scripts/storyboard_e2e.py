@@ -6,6 +6,7 @@ import os
 import shlex
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -64,14 +65,16 @@ def main() -> None:
     subprocess.run([sys.executable, "scripts/skill_flow_check.py"], cwd=ROOT, check=True)
 
     scene("4 — create profile and upload image")
+    run_id = str(int(time.time() * 1000))
+    unique_tag = f"storyboard-{run_id}"
     draft = {
-        "name": "MoodBoard",
-        "summary": "music ai playlist curation",
-        "raw_text": "FastAPI pgvector music ai waveform gradient",
+        "name": f"MoodBoard-{run_id}",
+        "summary": f"music ai playlist curation {unique_tag}",
+        "raw_text": f"FastAPI pgvector music ai waveform gradient {unique_tag}",
         "tech_stack": ["FastAPI", " pgvector "],
         "domain": "music-ai",
-        "tags": ["music", "ai"],
-        "keywords": ["waveform", "gradient"],
+        "tags": ["music", "ai", unique_tag],
+        "keywords": ["waveform", "gradient", unique_tag],
     }
     created = pgal(["profile", "create", "--data", "-", "--json"], stdin=draft)
     profile_id = created["id"]
@@ -94,7 +97,7 @@ def main() -> None:
     assert http_json(f"/imggen/{request_id}")["status"] == "stored"
 
     scene("5 — q/tag search")
-    same_search_args = ["search", "--q", "music ai", "--tags", "music", "--tech", "FastAPI,pgvector", "--tech-match", "all", "--json"]
+    same_search_args = ["search", "--q", unique_tag, "--tags", unique_tag, "--tech", "FastAPI,pgvector", "--tech-match", "all", "--json"]
     search1 = pgal(same_search_args)
     assert search1["items"] and search1["items"][0]["id"] == profile_id, search1
     assert len(search1["items"][0]["images"]) == 1
@@ -111,7 +114,7 @@ def main() -> None:
     scene("7 — delete invalidates search and image URL")
     pgal(["profile", "delete", profile_id, "--json"])
     search3 = pgal(same_search_args)
-    assert search3["items"] == [], search3
+    assert all(item["id"] != profile_id for item in search3["items"]), search3
     assert http_status(f"/images/{image_id}") == 404
     print("storyboard-e2e: ok")
 

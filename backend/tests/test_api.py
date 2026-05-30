@@ -53,6 +53,8 @@ async def test_profile_lifecycle_search_cache_imggen_and_image_file(tmp_path, mo
             )
             assert uploaded.status_code == 200
             image_id = uploaded.json()["image_id"]
+            image_path = tmp_path / "images" / f"{image_id}.png"
+            assert image_path.exists()
             assert (await client.get(f"/imggen/{request_id}")).json()["status"] == "stored"
             assert (await client.get(f"/images/{image_id}")).status_code == 200
             image_list = await client.get(f"/profiles/{profile_id}/images")
@@ -84,6 +86,8 @@ async def test_profile_lifecycle_search_cache_imggen_and_image_file(tmp_path, mo
             assert len(search.json()["items"][0]["images"]) == 1
 
             # Tag writes must invalidate cached profile and exact same search key.
+            missing_tag = await client.post("/profiles/00000000-0000-0000-0000-000000000000/tags", json={"tags": ["ghost"]})
+            assert missing_tag.status_code == 404
             added_tag = await client.post(f"/profiles/{profile_id}/tags", json={"tags": ["recsys"], "keywords": ["waveform"]})
             assert added_tag.status_code == 200
             tag_search = await client.get("/search", params=same_params)
@@ -125,6 +129,7 @@ async def test_profile_lifecycle_search_cache_imggen_and_image_file(tmp_path, mo
 
             deleted = await client.delete(f"/profiles/{profile_id}")
             assert deleted.status_code == 200
+            assert not image_path.exists()
             assert (await client.get(f"/images/{image_id}")).status_code == 404
             # Same exact query as before delete: proves cached search result was invalidated.
             assert (await client.get("/search", params=same_params)).json()["items"] == []

@@ -266,6 +266,9 @@ class Repository:
 
     async def add_tags(self, profile_id: UUID, data: TagUpdate) -> dict[str, Any]:
         async with self.pool.acquire() as conn:
+            exists = await conn.fetchval("SELECT EXISTS(SELECT 1 FROM profiles WHERE id = $1)", profile_id)
+            if not exists:
+                raise HTTPException(status_code=404, detail="profile not found")
             async with conn.transaction():
                 await self._upsert_tags(conn, profile_id, data.tags, "tag")
                 await self._upsert_tags(conn, profile_id, data.keywords, "keyword")
