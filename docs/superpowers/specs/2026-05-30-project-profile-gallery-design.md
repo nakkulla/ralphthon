@@ -21,7 +21,7 @@ CRUD API를 제공하며, 등록·수정·검색·삭제 전 과정을 단일 Co
 | 분석·이미지 생성 위치 | **Codex 스킬이 오케스트레이션** (분석·태그추출·`image_gen`은 Codex가, 저장/검색은 백엔드) |
 | 검색 방식 | **태그 + Postgres FTS** (pgvector RAG는 비목표, 이미지만 확보) |
 | 백엔드/CLI 스택 | **Python** — FastAPI(백엔드) + Typer(CLI) |
-| 프로파일 입력 형식 | **자유 텍스트/마크다운 파일** → Codex가 구조화 |
+| 프로파일 소스 | **Codex 스킬이 자동 수집** (현재 레포 + Codex 메모리/컨텍스트) → 등록 초안 생성 → 사용자 컨펌. 수동 텍스트/마크다운 파일은 선택적 보강/우선 입력 |
 | 이미지 저장 | **백엔드가 파일 저장 + URL 서빙**, DB엔 경로/메타데이터 |
 | 스킬 구조 | **단일 통합 스킬** `profile-gallery` (등록/수정/검색/삭제 분기) |
 | 스킬 구동 방식 | 스킬이 내부에서 **`pgal` CLI를 호출**해 입력·수정·검색·삭제 수행 |
@@ -231,11 +231,27 @@ skills/profile-gallery/
    └─ image-prompting.md # 대표 이미지 프롬프트 가이드
 ```
 
+**프로파일 소스 자동 수집 (등록의 0단계)**
+
+사용자가 "내 프로파일 등록해줘"라고 하면 스킬이 다음에서 프로젝트 정보를 자동 수집한다:
+
+- **현재 레포**: README, 매니페스트(`pyproject.toml`/`package.json`/`Cargo.toml` 등),
+  디렉터리 구조, `git remote` URL, 최근 커밋, 언어 구성.
+- **Codex 메모리/컨텍스트**: `AGENTS.md`, `~/.codex` 메모리, 현재 세션 지식.
+
+소스 우선순위: **사용자가 직접 준 파일/텍스트 > 레포 신호 > Codex 메모리**. 수동 입력이
+있으면 그것을 우선·보강에 사용하고, 없으면 자동 수집만으로 초안을 만든다.
+
 SKILL.md 워크플로 분기:
 
-- **(A) 등록**: 프로파일 텍스트 읽기 → 구조화(name·summary·tech_stack·domain) +
-  태그/키워드 추출 → 이미지 프롬프트 작성 → `image_gen` 호출 → 이미지 설명에서 키워드
-  보강 → `pgal profile create` → `pgal image add` → `pgal search`로 검증.
+- **(A) 등록**:
+  0. **자동 수집**: 위 소스에서 프로젝트 정보 수집.
+  1. 수집 내용 분석 → 구조화(name·summary·tech_stack·domain) + 태그/키워드 추출하여
+     **등록 초안** 작성.
+  2. **사용자 컨펌 게이트**: 초안을 사용자에게 제시하고 확인/수정을 받는다. 수정 요청 시
+     반복하고, 확인된 경우에만 다음 단계로 진행한다.
+  3. 이미지 프롬프트 작성 → `image_gen` 호출 → 이미지 설명에서 키워드 보강.
+  4. `pgal profile create` → `pgal image add` → `pgal search`로 검증.
 - **(B) 수정**: `pgal profile get`으로 현재 상태 조회 → 필드 재분석/편집(필요 시 이미지
   재생성) → `pgal profile update` / `pgal image add`.
 - **(C) 검색/브라우즈**: `pgal search`, `pgal tag`(브라우즈).
@@ -299,7 +315,9 @@ ralphthon/
 3. `pgal image add`로 업로드한 이미지가 `/images/{id}`로 서빙된다.
 4. `pgal search --q ... --tags ...`가 태그 + FTS 결합 결과를 반환한다.
 5. `pgal profile update`/`delete`가 동작하고 캐시가 무효화된다.
-6. `profile-gallery` 단일 스킬의 등록·수정 플로우가 `pgal` CLI 호출로 end-to-end 동작한다.
+6. `profile-gallery` 단일 스킬의 등록 플로우가 레포 + Codex 메모리에서 정보를 **자동
+   수집해 등록 초안을 만들고, 사용자 컨펌 후** `pgal` CLI 호출로 저장까지 end-to-end
+   동작한다(수정 플로우도 CLI 경유로 동작).
 7. 백엔드 단위테스트와 e2e 왕복 1회가 통과한다.
 
 ## 15. Execution lane
