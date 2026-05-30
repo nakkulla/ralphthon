@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "ralphthon",
+  "project_id": "64866ad8-dd25-40c5-94cd-ec8f10605dd5"
+}
