@@ -1,1 +1,2 @@
 {"id":"int-34c41331","kind":"field_change","created_at":"2026-05-30T06:51:03.623566Z","actor":"ilsun yun","issue_id":"ralphthon-bje","extra":{"field":"status","new_value":"in_progress","old_value":"open"}}
+{"id":"int-1646d183","kind":"field_change","created_at":"2026-05-30T06:54:03.93915Z","actor":"ilsun yun","issue_id":"ralphthon-bje.1","extra":{"field":"status","new_value":"resolved","old_value":"open"}}
