@@ -55,3 +55,6 @@
 # - github.token    → use GITHUB_TOKEN env var instead
 
 sync.remote: "https://doltremoteapi.dolthub.com/nakkulla/ralphthon-beads"
+sync:
+  git-remote: origin
+  remote-url: https://doltremoteapi.dolthub.com/nakkulla/ralphthon-beads
