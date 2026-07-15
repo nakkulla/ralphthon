@@ -1,7 +1,9 @@
 {
-  "database": "dolt",
+  "database": "ralphthon",
   "backend": "dolt",
   "dolt_mode": "server",
   "dolt_database": "ralphthon",
-  "project_id": "64866ad8-dd25-40c5-94cd-ec8f10605dd5"
+  "project_id": "64866ad8-dd25-40c5-94cd-ec8f10605dd5",
+  "dolt_server_host": "127.0.0.1",
+  "dolt_server_port": 3307
 }
